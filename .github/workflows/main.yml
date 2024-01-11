@@ -1,33 +1,32 @@
-name: Docker Build
-
+---
+name: Build and Push Golang Image to AWS ECR
 on:
   workflow_dispatch:
-
 jobs:
-  build:
+  build-and-push:
+    name: Build and Push to ECR
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout Repository
+    - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Build Docker Image
-      run: docker build -t sample-nodejs .
-
     - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v4
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      # with:
-      #   aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #   aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ap-south-1
-    - name: Login to ECR
-      run: aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 454143665149.dkr.ecr.ap-south-1.amazonaws.com
 
-    - name: Tag Docker Image
-      run: docker tag sample-nodejs:latest 454143665149.dkr.ecr.ap-south-1.amazonaws.com/sample-nodejs:latest
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Push to ECR
-      run: docker push 454143665149.dkr.ecr.ap-south-1.amazonaws.com/sample-nodejs:latest
+    - name: Build, Tag, and Push the Image to Amazon ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: sample-nodejs
+        IMAGE_TAG: latest
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
