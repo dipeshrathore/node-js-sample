@@ -13,3 +13,12 @@ jobs:
 
     - name: Build Docker Image
       run: docker build -t sample-nodejs .
+
+    - name: Login to ECR
+      run: aws ecr get-login-password --region <your-region> | docker login --username AWS --password-stdin <your-account-id>.dkr.ecr.<your-region>.amazonaws.com
+
+    - name: Tag Docker Image
+      run: docker tag sample-nodejs:latest <your-account-id>.dkr.ecr.<your-region>.amazonaws.com/sample-nodejs:latest
+
+    - name: Push to ECR
+      run: docker push <your-account-id>.dkr.ecr.<your-region>.amazonaws.com/sample-nodejs:latest
