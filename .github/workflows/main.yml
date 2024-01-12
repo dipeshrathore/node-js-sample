@@ -2,6 +2,16 @@
 name: Build and Push Image to AWS ECR
 on:
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Slect version to update for image'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
 jobs:
   build-and-push:
     name: Build and Push to ECR
@@ -21,6 +31,11 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
+    - name: Automatic Tagging of Releases
+      id: increment-git-tag
+      run: |
+        bash ./git_update.sh -v ${{ github.event.inputs.version }}
+        
     - name: Build, Tag, and Push the Image to Amazon ECR
       id: build-image
       env:
