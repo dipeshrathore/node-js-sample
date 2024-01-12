@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Slect version to update for image'
+        description: 'Select version to update for image'
         required: true
         default: 'patch'
         type: choice
