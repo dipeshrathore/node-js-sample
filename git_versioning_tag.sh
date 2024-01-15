@@ -28,10 +28,11 @@ VNUM1=${CURRENT_VERSION_PARTS[0]}
 VNUM2=${CURRENT_VERSION_PARTS[1]}
 VNUM3=${CURRENT_VERSION_PARTS[2]}
 
-
+echo "*****************VNUM1: ${VNUM1}"
 if [[ $VERSION == 'major' ]]
 then
   VNUM1=v$((VNUM1+1))
+  echo "*****************after updating VNUM1: ${VNUM1}"
   VNUM2=0
   VNUM3=0
 elif [[ $VERSION == 'minor' ]]
