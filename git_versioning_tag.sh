@@ -66,3 +66,5 @@ fi
 echo ::set-output name=git-tag::$NEW_TAG
 
 exit 0
+
+
